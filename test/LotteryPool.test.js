@@ -1,36 +1,36 @@
 const { expectRevert, time } = require('@openzeppelin/test-helpers');
 const { assert } = require('chai');
-const CakeToken = artifacts.require('CakeToken');
+const PieToken = artifacts.require('PieToken');
 const SyrupBar = artifacts.require('SyrupBar');
 const MasterChef = artifacts.require('MasterChef');
-const MockBEP20 = artifacts.require('libs/MockBEP20');
+const MockOIP20 = artifacts.require('libs/MockOIP20');
 const LotteryRewardPool = artifacts.require('LotteryRewardPool');
 
 contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
   beforeEach(async () => {
-    this.cake = await CakeToken.new({ from: minter });
-    this.syrup = await SyrupBar.new(this.cake.address, { from: minter });
-    this.lp1 = await MockBEP20.new('LPToken', 'LP1', '1000000', {
+    this.pie = await PieToken.new({ from: minter });
+    this.syrup = await SyrupBar.new(this.pie.address, { from: minter });
+    this.lp1 = await MockOIP20.new('LPToken', 'LP1', '1000000', {
       from: minter,
     });
-    this.lp2 = await MockBEP20.new('LPToken', 'LP2', '1000000', {
+    this.lp2 = await MockOIP20.new('LPToken', 'LP2', '1000000', {
       from: minter,
     });
-    this.lp3 = await MockBEP20.new('LPToken', 'LP3', '1000000', {
+    this.lp3 = await MockOIP20.new('LPToken', 'LP3', '1000000', {
       from: minter,
     });
-    this.lp4 = await MockBEP20.new('LPToken', 'LP4', '1000000', {
+    this.lp4 = await MockOIP20.new('LPToken', 'LP4', '1000000', {
       from: minter,
     });
     this.chef = await MasterChef.new(
-      this.cake.address,
+      this.pie.address,
       this.syrup.address,
       dev,
       '10',
       '10',
       { from: minter }
     );
-    await this.cake.transferOwnership(this.chef.address, { from: minter });
+    await this.pie.transferOwnership(this.chef.address, { from: minter });
     await this.syrup.transferOwnership(this.chef.address, { from: minter });
 
     await this.lp1.transfer(bob, '2000', { from: minter });
@@ -46,7 +46,7 @@ contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
     await time.advanceBlockTo('70');
     this.lottery = await LotteryRewardPool.new(
       this.chef.address,
-      this.cake.address,
+      this.pie.address,
       dev,
       carol,
       { from: minter }
@@ -68,7 +68,7 @@ contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
 
     assert.equal((await this.lottery.pendingReward('4')).toString(), '3');
     assert.equal(
-      (await this.cake.balanceOf(this.lottery.address)).toString(),
+      (await this.pie.balanceOf(this.lottery.address)).toString(),
       '0'
     );
 
@@ -76,16 +76,16 @@ contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
     // console.log(await this.lottery.pendingReward(4).toString())
 
     assert.equal(
-      (await this.cake.balanceOf(this.lottery.address)).toString(),
+      (await this.pie.balanceOf(this.lottery.address)).toString(),
       '0'
     );
-    assert.equal((await this.cake.balanceOf(carol)).toString(), '5');
+    assert.equal((await this.pie.balanceOf(carol)).toString(), '5');
   });
 
   it('setReceiver', async () => {
     this.lottery = await LotteryRewardPool.new(
       this.chef.address,
-      this.cake.address,
+      this.pie.address,
       dev,
       carol,
       { from: minter }
@@ -108,7 +108,7 @@ contract('MasterChef', ([alice, bob, carol, dev, minter]) => {
   it('update admin', async () => {
     this.lottery = await LotteryRewardPool.new(
       this.chef.address,
-      this.cake.address,
+      this.pie.address,
       dev,
       carol,
       { from: minter }
