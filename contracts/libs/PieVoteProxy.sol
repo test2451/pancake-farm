@@ -1,6 +1,6 @@
 pragma solidity 0.6.12;
 
-interface IBEP20 {
+interface IOIP20 {
     /**
      * @dev Returns the amount of tokens in existence.
      */
@@ -113,11 +113,11 @@ contract PancakeVoterProxy {
     }
 
     function totalSupply() external view returns (uint256) {
-        return IBEP20(votes).totalSupply();
+        return IOIP20(votes).totalSupply();
     }
 
     function balanceOf(address _voter) external view returns (uint256) {
-        return IBEP20(votes).balanceOf(_voter);
+        return IOIP20(votes).balanceOf(_voter);
     }
 
     constructor() public {}
