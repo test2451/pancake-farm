@@ -1,28 +1,28 @@
 pragma solidity 0.6.12;
 
-import '@pancakeswap/pancake-swap-lib/contracts/token/BEP20/IBEP20.sol';
-import '@pancakeswap/pancake-swap-lib/contracts/token/BEP20/SafeBEP20.sol';
-import '@pancakeswap/pancake-swap-lib/contracts/access/Ownable.sol';
+import '@pieswap/pie-swap-lib/contracts/token/OIP20/IOIP20.sol';
+import '@pieswap/pie-swap-lib/contracts/token/OIP20/SafeOIP20.sol';
+import '@pieswap/pie-swap-lib/contracts/access/Ownable.sol';
 
 import './MasterChef.sol';
 
 contract LotteryRewardPool is Ownable {
-    using SafeBEP20 for IBEP20;
+    using SafeOIP20 for IOIP20;
 
     MasterChef public chef;
     address public adminAddress;
     address public receiver;
-    IBEP20 public lptoken;
-    IBEP20 public cake;
+    IOIP20 public lptoken;
+    IOIP20 public pie;
 
     constructor(
         MasterChef _chef,
-        IBEP20 _cake,
+        IOIP20 _pie,
         address _admin,
         address _receiver
     ) public {
         chef = _chef;
-        cake = _cake;
+        pie = _pie;
         adminAddress = _admin;
         receiver = _receiver;
     }
@@ -36,7 +36,7 @@ contract LotteryRewardPool is Ownable {
         _;
     }
 
-    function startFarming(uint256 _pid, IBEP20 _lptoken, uint256 _amount) external onlyAdmin {
+    function startFarming(uint256 _pid, IOIP20 _lptoken, uint256 _amount) external onlyAdmin {
         _lptoken.safeApprove(address(chef), _amount);
         chef.deposit(_pid, _amount);
         emit StartFarming(msg.sender, _pid);
@@ -44,8 +44,8 @@ contract LotteryRewardPool is Ownable {
 
     function  harvest(uint256 _pid) external onlyAdmin {
         chef.deposit(_pid, 0);
-        uint256 balance = cake.balanceOf(address(this));
-        cake.safeTransfer(receiver, balance);
+        uint256 balance = pie.balanceOf(address(this));
+        pie.safeTransfer(receiver, balance);
         emit Harvest(msg.sender, _pid);
     }
 
@@ -54,12 +54,12 @@ contract LotteryRewardPool is Ownable {
     }
 
     function  pendingReward(uint256 _pid) external view returns (uint256) {
-        return chef.pendingCake(_pid, address(this));
+        return chef.pendingPie(_pid, address(this));
     }
 
     // EMERGENCY ONLY.
-    function emergencyWithdraw(IBEP20 _token, uint256 _amount) external onlyOwner {
-        cake.safeTransfer(address(msg.sender), _amount);
+    function emergencyWithdraw(IOIP20 _token, uint256 _amount) external onlyOwner {
+        pie.safeTransfer(address(msg.sender), _amount);
         emit EmergencyWithdraw(msg.sender, _amount);
     }
 
