@@ -1,13 +1,13 @@
 pragma solidity 0.6.12;
 
-import "@pancakeswap/pancake-swap-lib/contracts/token/BEP20/BEP20.sol";
+import "@pieswap/pie-swap-lib/contracts/token/OIP20/OIP20.sol";
 
-contract MockBEP20 is BEP20 {
+contract MockOIP20 is OIP20 {
     constructor(
         string memory name,
         string memory symbol,
         uint256 supply
-    ) public BEP20(name, symbol) {
+    ) public OIP20(name, symbol) {
         _mint(msg.sender, supply);
 
     }
